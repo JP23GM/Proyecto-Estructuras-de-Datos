@@ -1,0 +1,1155 @@
+#include <iostream>
+#include <conio.h>
+#include <stdlib.h>
+#include <string>
+#include <set>
+#include <cctype> // para convertir caracteres a mayus también
+
+  
+#include<bits/stdc++.h> // PARA USAR TRANSFORM Y CONVERTIR NOMBRES A MAYUSCULAS
+
+using namespace :: std;
+
+struct NodoUsuario{
+	
+	string Nombre;
+	string PrimerApellido;
+	string SegundoApellido;
+	int TelefonoCelular;
+	int TelefonoHabitacion;
+	int Cedula;
+	
+	NodoUsuario *siguiente;
+	NodoUsuario *anterior; //creo NODO anterior para trabajar con listas dobles
+	
+} *primero, *ultimo;
+
+
+//STRUCT NODO PARA LA LISTA CIRCULAR DE LOS USUARIOS QUE SE LES HA DADO DE BAJA
+
+struct nodoCircular{
+    int cedula;
+    string nombre;
+	string primerApellido;
+	string segundoApellido;
+	int telefonoCelular;
+	int telefonoHabitacion;
+	nodoCircular *siguienteCircular;
+	nodoCircular *anteriorCircular;
+	
+} *primeroCircular, *ultimoCircular;
+
+nodoCircular *listaCircular = NULL;
+
+NodoUsuario *lista = NULL;
+
+void menu();
+void menu2();
+void InsertarUsuario(NodoUsuario *&, string, string, string, int , int, int);
+void ModificarUsuario();
+void EliminarUsuario();
+void BuscarUsuario(NodoUsuario *&, int);
+void MostrarUsuarios();
+void inactivarUsuario();
+void activarUsuario();
+void mostrarListaBajas(); // funcion para mostrar la lista de contactos que estan inactivos
+void insertarListaCircular(nodoCircular *&, string, string, string, int , int, int ) ;// Desarrollamos funcion para insertar inactivos en la lista Circular
+bool BuscarUsuarioTodasListas (NodoUsuario *&, int);
+void BuscarPorLetra();
+
+
+
+int main() {
+	
+	menu();
+	getch();
+	return 0;
+	
+}
+
+void menu(){
+
+	int opcion_menu = 0, dato;
+
+	do{
+		cout << "\n|----------------------------------------------|";
+		cout << "\n|        Estimado usuario sea coordialmente    |";
+		cout << "\n|                 bienvenido al                |";
+		cout << "\n|           SITEMA DE LA GUIA TELEFONICA       |";
+		cout << "\n|-----------------------|----------------------|";
+		cout << "\n| 1. Ingresar usuario   | 5. Mostrar listas    |";
+		cout << "\n| 2. Modificar usuario  | 6. Inactivar usuario |";
+		cout << "\n| 3. Eliminar usuario   | 7. Activar usuario   |";
+		cout << "\n| 4. Buscar usuario     | 8. Salir             |";
+		cout << "\n|                       | 9. Buscar por letra  |";
+		cout << "\n|-----------------------|----------------------|";
+		cout << "\n\n Escoja una opcion: ";
+		cin >> opcion_menu;
+		
+		switch(opcion_menu){
+		case 1:
+			cout << "\n\n ----- INGRESAR USUARIO ----- \n\n";
+		//	InsertarUsuario();   //MUEVO ESTA FUNCION AL MENU 2
+			menu2();             // HABILITO ESTE MENU PARA ELEGIR ENTRE USUARIO ACTIVO O INACTIVO
+			cout<<"\n";
+			system("pause");
+		break;
+		
+		case 2:
+			cout << "\n\n ----- MODIFICAR USUARIO ----- \n\n";
+			ModificarUsuario();
+			cout<<"\n";
+			system("pause");
+		break;
+		
+		case 3:
+			cout << "\n\n ----- ELIMINAR USUARIO ----- \n\n";
+			EliminarUsuario();
+			cout<<"\n";	
+			system("pause");
+		break;
+		
+		case 4:
+			cout << "\n\n ----- BUSCAR USUARIO ----- \n\n";
+				cout << "\n Ingrese la cedula, el telefono celular o el telefono de habitacion del usuario que quiere buscar: ";
+            	cin >>dato;
+		//	BuscarUsuario (lista,  dato);
+		    
+			if(BuscarUsuarioTodasListas(lista, dato) == true){
+				cout<<"************************************** FIN BUSQUEDA *********************************************************** \n\n";
+			}else{
+				cout<<" USUARIO NO ENCONTRADO EN LAS LISTAS \n";
+			};
+			cout<<"\n";
+			system("pause");
+		break;
+		
+		case 5:
+			cout << "\n\n ----- MOSTRAR USUARIOS ----- \n\n";
+			MostrarUsuarios();
+			mostrarListaBajas();
+			cout<<"\n";
+			system("pause");
+		break;
+		
+	
+		case 6:
+			cout << "\n\n INACTIVAR USUARIO \n\n";
+			inactivarUsuario();
+			cout<<"\n";
+			system("pause");
+		break;
+		
+		case 7:
+			cout << "\n\n ACTIVAR USUARIO \n\n";
+			activarUsuario();
+			cout<<"\n";
+			system("pause");
+		break;
+	
+		
+		case 8:
+			cout << "\n\n ----- SALIENDO DEL SISTEMA... ----- \n\n";
+		break;
+		
+		case 9:
+			BuscarPorLetra();
+			system("pause");
+		default:
+			cout << "\n\n ----- OPCION NO VALIDA ----- \n\n";
+		}
+	} while (opcion_menu != 8);
+}
+
+
+
+void menu2(){
+
+	int opcion_menu2 ,telefonoCelular,telefonoHabitacion,cedula, TelefonoCelular,TelefonoHabitacion,Cedula , dato;   // CREO LAS VARIABLES PARA INGRESAR LOS DATOS DEL CONTACTO;
+	string nombre,primerApellido,segundoApellido, Nombre,PrimerApellido,SegundoApellido;
+	
+	do{
+		cout << "\n|----------------------------------------------|";
+		cout << "\n|               ESTADO DEL USUARIO             |";
+		cout << "\n|-----------------------|----------------------|";
+		cout << "\n|                                              |";
+		cout << "\n|         0. El usuario esta inactivo          |";
+		cout << "\n|         1. El usuario esta activo            |";
+		cout << "\n|                                              |";
+		cout << "\n|-----------------------|----------------------|";
+		cout << "\n\n Ingrese el estado del usuario: ";
+		cin >> opcion_menu2;
+		
+		switch(opcion_menu2){   //AGREGUE LOS CASES DE ESTE MENU
+			case 0:     						         
+				      	cout << "\n Ingrese el nombre del contacto: ";
+	                    cin.ignore();
+	                    getline(cin, nombre);
+						transform(nombre.begin(), nombre.end(), nombre.begin(), ::toupper); //TRANSFORMO NOMBRE A MAYUSCULAS	                  	
+                      	cout << "\n Ingrese el primer apellido del contacto: ";
+                    	getline(cin, primerApellido);
+                    	transform(primerApellido.begin(), primerApellido.end(),primerApellido.begin(), ::toupper); //TRANSFORMO primerApellido A MAYUSCULAS
+	                    cout << "\n Ingrese el segundo apellido del contacto: ";
+                    	getline(cin, segundoApellido);
+						transform(segundoApellido.begin(), segundoApellido.end(),segundoApellido.begin(), ::toupper); //TRANSFORMO segundoApellido A MAYUSCULAS	
+	                    cout << "\n Ingrese el telefono celular del contacto: ";
+                        cin>>telefonoCelular;
+	                    cout << "\n Ingrese el telefono de habitacion del contacto: ";
+	                    cin >> telefonoHabitacion;	
+	                    cout << "\n Ingrese la cedula del contacto: ";
+	                    cin >> cedula;
+	                    dato = cedula;
+	                    //VALIDACION PARA BUSCAR SI EL # DE CEDULA A INGRESAR YA EXISTE TANTO EN LISTA DE ACTIVOS COMO INACTIVOS
+	                    cout<<"NUMERO CEDULA INGRESADO ES: "<<dato<<"\n";
+	                    
+	                    	if(BuscarUsuarioTodasListas(lista, dato) == true){
+				            cout<<"************************************** FIN BUSQUEDA *********************************************************** \n\n";
+			                }else{
+				            insertarListaCircular(listaCircular, nombre, primerApellido, segundoApellido, telefonoCelular, telefonoHabitacion, cedula);
+			                   };
+	                    
+	                    
+	                  //  system("pause");
+			            break;
+
+			case 1:        //PASO#1. PEDIMOS LOS DATOS AL INICIO PARA ENVIAR POR PARAMETROS A LA FUNCION INSERTAR LISTA DOBLEMENTE ENLAZADA
+			            	cout << "\n Ingrese el nombre del usuario: ";
+	                        cin.ignore();
+                            getline(cin, Nombre);
+	                       // using transform() function and ::toupper in STL
+                           transform(Nombre.begin(), Nombre.end(), Nombre.begin(), ::toupper); //TRANSFORMO NOMBRE A MAYUSCULAS
+                           // cout<<"\n PRUEBA NOMBRE MAYUSCULA:"<<Nombre<<endl;
+	                       cout << "\n Ingrese el primer apellido del usuario: ";
+	                       getline(cin, PrimerApellido);
+	                       transform(PrimerApellido.begin(), PrimerApellido.end(), PrimerApellido.begin(), ::toupper); //TRANSFORMO PRIMER APELLIDO A MAYUSCULAS
+	                       cout << "\n Ingrese el segundo apellido del usuario: ";
+	                       getline(cin, SegundoApellido);
+	                       transform(SegundoApellido.begin(), SegundoApellido.end(), SegundoApellido.begin(), ::toupper); //TRANSFORMO SEGUNDO APELLIDO A MAYUSCULAS	
+	                       cout << "\n Ingrese el telefono celular del usuario: ";
+	                       cin >>TelefonoCelular;	
+	                       cout << "\n Ingrese el telefono de habitacion del usuario: ";
+	                       cin >>TelefonoHabitacion;	
+	                       cout << "\n Ingrese la cedula del usuario: ";
+	                       cin >>Cedula;
+	                       //VALIDACION PARA BUSCAR SI EL # DE CEDULA A INGRESAR YA EXISTE TANTO EN LISTA DE ACTIVOS COMO INACTIVOS
+	                       //PASO#2. VALIDAMOS SI EL NUMERO DE CEDULA EXISTE TANTO EN LA LISTA DOBLEMENTE ENLAZADA COMO EN LA LISTA CIRCULAR
+						   //PASO#3. 
+						   //llamamos a la funcion insertar lista doblemente enlazada	
+						    dato = Cedula;
+	                       cout<<"NUMERO CEDULA INGRESADO ES: "<<dato<<"\n";
+	                    
+	                    	if(BuscarUsuarioTodasListas(lista, dato) == true){
+				            cout<<"************************************** FIN BUSQUEDA *********************************************************** \n\n";
+			                }else{
+				            InsertarUsuario(lista,Nombre,PrimerApellido,SegundoApellido, TelefonoCelular,TelefonoHabitacion,Cedula );
+			                   };							
+			           	   
+					//	system("pause");
+			               break;
+												
+			default:
+				cout << "\n\n Opcion no valida \n\n";
+			}
+		}while(opcion_menu2 != 0 && opcion_menu2 != 1);
+}
+
+		
+void InsertarUsuario(NodoUsuario *&lista, string Nombre, string PrimerApellido , string SegundoApellido , int TelefonoCelular, int TelefonoHabitacion, int Cedula){
+	
+	NodoUsuario *nuevo_nodo = new NodoUsuario();
+	nuevo_nodo->Nombre = Nombre;
+	nuevo_nodo->PrimerApellido = PrimerApellido;
+	nuevo_nodo->SegundoApellido = SegundoApellido;
+	nuevo_nodo->TelefonoCelular = TelefonoCelular;
+	nuevo_nodo->TelefonoHabitacion =TelefonoHabitacion;
+	nuevo_nodo->Cedula = Cedula;
+	
+	//menu2();  OCULTO UN SEGUNDO LLAMADO DEL MENU2
+	
+	NodoUsuario *aux1 = primero;  //LISTA DOBLE LO IGUALO A PRIMERO EN LUGAR DE LISTA
+	NodoUsuario *aux2;
+	
+	 NodoUsuario *atras = NULL;  //PUEDO USARLO EN LA LISTA DOBLE 
+		
+		//IF-ELSE CONDICIONAL PARA VALIDAR SI EL PRIMER VALOR ES NULL PARA INGRESAR EL CONTACTO ACA O NO
+		if(primero == NULL){    //
+		primero = nuevo_nodo;     //
+		primero->siguiente = NULL;  //
+		primero->anterior = NULL;   //
+		ultimo = nuevo_nodo;    //
+		
+	}else{           //AGREO CICLO WHILE PARA ORDENAR EL INGRESO DE CONTACTOS POR ORDEN ALFABETICO
+	
+		while((aux1 != NULL)&&(aux1->Nombre < Nombre )){
+			aux2 = aux1;
+			aux1 = aux1->siguiente;
+			
+		}if(primero == aux1 ){
+	    primero->anterior = nuevo_nodo;	
+		nuevo_nodo->anterior =NULL;	
+    	nuevo_nodo->siguiente = aux1;
+    	primero = nuevo_nodo;
+		}
+ 		 else if((aux1 != NULL ) && (aux1->Nombre > Nombre)){
+		 	
+		 	aux2->siguiente = nuevo_nodo;	 
+			nuevo_nodo->anterior = aux2;	
+		 	nuevo_nodo->siguiente = aux1;
+		 	aux1->anterior = nuevo_nodo;
+		
+			 }        
+			
+			else{
+		     	aux2->siguiente = nuevo_nodo;
+	            ultimo->siguiente = nuevo_nodo;
+		        nuevo_nodo->siguiente = NULL;
+		        nuevo_nodo->anterior = ultimo;
+		        ultimo = nuevo_nodo;
+	                  	}
+		
+        }
+ 
+                   cout << "\n\n El usuario ha sido ingresado exitosamente \n\n";
+  }
+
+//DESAROLLAMOS FUNCION PARA INSERTAR CONTACTOS EN LA LISTA CIRCULAR 
+
+void insertarListaCircular(nodoCircular *&listaCircular, string nombre, string primerApellido , string segundoApellido , int telefonoCelular, int telefonoHabitacion, int cedula){
+	nodoCircular *nuevo_nodo = new nodoCircular();
+	nuevo_nodo->nombre = nombre;
+	nuevo_nodo->primerApellido = primerApellido;
+	nuevo_nodo->segundoApellido = segundoApellido;
+	nuevo_nodo->telefonoCelular = telefonoCelular;
+	nuevo_nodo->telefonoHabitacion = telefonoHabitacion;
+	nuevo_nodo->cedula = cedula;
+		
+		
+     nodoCircular *aux1 = primeroCircular;  //cambio a ultimo para crear nuevos nodos
+	 nodoCircular *aux2;
+	 
+	 bool encontrado = false;
+	 bool new_validation = false;	
+		
+	if(primeroCircular == NULL){
+		primeroCircular = nuevo_nodo;
+		primeroCircular->siguienteCircular = primeroCircular;
+		ultimoCircular= primeroCircular;
+	}else{    		 
+			//**************************************
+		  //CONDICIONAL IF PARA COMPARAR SI EL PRIMER VALOR ES EL PRIMERO & ULTIMO 
+		  //SI EL NUEVO VALOR ES MAYOR AL PRIMERO , ENTONCES CREAMOS UN NUEVO NODO AL INICIO COMO PRIMERO Y CORRO EL VALOR EXISTENTE A LA SEGUNDA POSICION COMO ULTIMO
+		  if((aux1 != NULL ) && (aux1->nombre > nombre) && (primeroCircular == ultimoCircular)){
+		  	
+		  	primeroCircular->anteriorCircular = nuevo_nodo;
+		  	nuevo_nodo->siguienteCircular = ultimoCircular;  //aux1
+		  	primeroCircular = nuevo_nodo;
+		  	primeroCircular->siguienteCircular = ultimoCircular;
+		  	ultimoCircular->siguienteCircular = primeroCircular;
+		  	ultimoCircular->anteriorCircular = primeroCircular;
+		  	
+		 //  cout<<"GUARDO VALOR CUANDO INGRESO UN # MENOR AL PRIMERO DE LA LISTA INGRESO 1 Y TENGO 2 COMO PRIMER VALOR EN LA LISTA Y SOLO TENGO UN VALOR EN LSITA \n";
+		
+			 } 
+			else if((aux1 != NULL ) && (aux1->nombre < nombre) && (primeroCircular == ultimoCircular)){
+		 	ultimoCircular->siguienteCircular = nuevo_nodo;
+		 	nuevo_nodo->siguienteCircular = primeroCircular;
+		    ultimoCircular = nuevo_nodo;
+		    ultimoCircular->anteriorCircular = primeroCircular;	
+			primeroCircular->siguienteCircular = ultimoCircular;	 
+			
+		//	 cout<<"GUARDO VALOR CUANDO INGRESO UN # MAYOR AL PRIMERO DE LA LISTA INGRESO 2 Y TENGO 1 COMO PRIMER VALOR EN LA LISTA Y SOLO TENGO UN VALOR EN LISTA \n";	
+		
+			 }  
+			 
+		while((aux1 != NULL)&&(aux1->nombre < nombre ) && (primeroCircular != ultimoCircular) && (encontrado != true)){   ///OJO PENDIENTE
+			aux2 = aux1;
+			aux1 = aux1->siguienteCircular;
+			new_validation = true;
+			cout<<"Nombre es: " << nombre <<"\n"; //validacion para Debugging
+			   if (aux1 == primeroCircular){
+			   	  encontrado = true;
+			   }
+		}
+		
+		if((aux1 != NULL)&&(aux1->nombre < nombre ) && (aux1 == primeroCircular )){
+			
+			ultimoCircular->siguienteCircular = nuevo_nodo;
+		 	nuevo_nodo->siguienteCircular = primeroCircular;
+		 	nuevo_nodo->anteriorCircular = ultimoCircular;
+		    ultimoCircular = nuevo_nodo;			
+		}
+		
+		//CONDICIONAL PARA INSERTAR UN NUMERO DELANTE DEL PRIMERO
+		else if((aux1 != NULL)&&(aux1->nombre > nombre ) && (aux1 == primeroCircular )){
+			
+	
+		    
+		    primeroCircular->anteriorCircular = nuevo_nodo;
+		    nuevo_nodo->siguienteCircular = primeroCircular;
+		  	primeroCircular = nuevo_nodo;
+		  	ultimoCircular->siguienteCircular = primeroCircular;
+
+		}
+	                  	
+		 else if((aux1 != NULL) && (aux1->nombre > nombre) && (aux1 == ultimoCircular) &&(aux2 == primeroCircular)){
+		 	aux2->siguienteCircular = nuevo_nodo;	 
+			nuevo_nodo->anteriorCircular = aux2;	
+		 	nuevo_nodo->siguienteCircular = aux1;
+		 	aux1->anteriorCircular = nuevo_nodo;
+		    aux1->siguienteCircular = primeroCircular;
+		    ultimoCircular = aux1;
+		    primeroCircular = aux2;		
+		//	cout<<"AUX1 = ULTIMO & AUX2 = PRIMERO \n";
+		//	cout<<"GUARDO VALOR CUANDO AUX1->SIGUIENTE ES == NULL , 1 = aux2 -> 2X -> 4 = aux1 \n";
+			
+		}
+		// NO TOCAMOS PRIMERO NI ULTIMO VALOR DE LA LISTA 
+ 		 else if((aux1 != NULL ) && (aux1->nombre > nombre) && (aux1 != ultimoCircular) &&(aux2 != primeroCircular)){   // OJO PENDIENTE
+		 	
+		 	aux2->siguienteCircular = nuevo_nodo;	 
+			nuevo_nodo->anteriorCircular = aux2;	
+		 	nuevo_nodo->siguienteCircular = aux1;
+		 	aux1->anteriorCircular = nuevo_nodo;
+		 	
+		 //		cout<<"SE EJECUTA POR DEFECTO #1 \n";
+		
+			 } 
+			 
+			 //ELSE IF PARA COMPARAR SI EL VALOR DE LA LISTA ES MENOR AL NUEVO INGRESADO POR EL USUARIO Y SI EL VALOR DEL AUX2 ES IGUAL AL PRIMERO
+			 //EL AUX1 ES MAYOR AL VALOR NUEVO INGRESADO PARA EL CONTACTO
+			 //SE AGREGA EL NUEVO VALOR EN LA SEGUNDA POSICION DE LA LISTA
+			  else if((aux1 != NULL ) && (aux1->nombre > nombre)  &&(aux2 == primeroCircular)){   // OJO PENDIENTE
+		 	
+		 	aux2->siguienteCircular = nuevo_nodo;	 
+			nuevo_nodo->anteriorCircular = aux2;	
+		 	nuevo_nodo->siguienteCircular = aux1;
+		 	aux1->anteriorCircular = nuevo_nodo;
+		 	primeroCircular = aux2;
+		 	primeroCircular->siguienteCircular = nuevo_nodo;
+		 	
+		 //		cout<<"SE EJECUTA PORQUE AUX2 es == PRIMERO PERO AUX1 NO ES = A ULTIMO \n";
+		
+			 }
+			   else if((aux1 != NULL ) && (aux1->nombre > nombre)  &&(aux1 == ultimoCircular) && (new_validation == true)){
+			   	
+		     	aux2->siguienteCircular = nuevo_nodo;
+		     	nuevo_nodo->siguienteCircular = ultimoCircular;
+		        nuevo_nodo->anteriorCircular = aux2;
+	            ultimoCircular->siguienteCircular = primeroCircular;
+	            ultimoCircular->anteriorCircular = nuevo_nodo;
+		        
+		        
+		      //  	cout<<"SE EJECUTA PORQUE AUX1 ES == ULTIMO PERO AUX2 NO ES = A PRIMERO";
+		        
+	                  	}           		 
+		
+	}
+	
+	
+	cout<<"Contacto INACTIVO ingresado correctamente \n";
+}
+
+
+
+
+void ModificarUsuario(){
+	
+	NodoUsuario *nodo_actual = new NodoUsuario();
+	nodo_actual = primero;
+	bool nodo_encontrado = false;
+	int nodo_buscado;
+	cout << "\n Ingrese la cedula del usuario que quiere modificar: ";
+	cin >> nodo_buscado;
+	
+	if(primero != NULL){
+		
+		while(nodo_actual != NULL && nodo_encontrado != true){
+			if(nodo_actual -> Cedula == nodo_buscado){
+				cout << "\n El usuario con la cedula: " << nodo_buscado << ", ha sido encontrado con exito \n";
+				
+				cout << "\n Ingrese el nuevo numero telefonico celular para este usuario: ";
+				cin >> nodo_actual -> TelefonoCelular;
+								
+				cout << "\n Ingrese el nuevo numero telefonico de habitacion para este usuario: ";
+				cin >> nodo_actual -> TelefonoHabitacion;
+				
+				nodo_encontrado = true;
+				cout << "\n Los numeros telefonicos del usuario han sido modicados con exito \n\n";
+				
+			}else{
+				nodo_actual = nodo_actual -> siguiente;
+			}
+		}
+		
+		if(!nodo_encontrado){
+			cout << "\n\n Usuario no encontrado \n\n";
+		}
+	}else{
+		cout << "\n\n La lista se encuentra vacia \n\n";
+	}	
+}
+
+void EliminarUsuario(){
+	
+	NodoUsuario *nodo_actual = new NodoUsuario();
+	nodo_actual = primero;
+	NodoUsuario *nodo_atras = new NodoUsuario();
+	nodo_atras = NULL;
+	bool nodo_encontrado = false;
+	int nodo_buscado;
+	cout << "\n Ingrese la cedula del usuario que quiere eliminar: ";
+	cin >> nodo_buscado;
+	
+	if(primero != NULL){
+		
+		while(nodo_actual != NULL && nodo_encontrado != true){
+			if(nodo_actual -> Cedula == nodo_buscado){
+				cout << "\n El usuario con la cedula: " << nodo_buscado << ", ha sido encontrado con exito \n\n";
+				
+			 if((primero->anterior == NULL) && (primero->siguiente == NULL)){
+		         primero = NULL;
+		         ultimo = NULL;
+	            
+		         nodo_encontrado = true;
+                           }
+				else if(nodo_actual == primero){
+					primero = primero->siguiente;
+					primero->anterior = NULL;
+					
+				}else if(nodo_actual == ultimo){
+					nodo_atras->siguiente = NULL;
+					ultimo = nodo_atras;
+				}else{
+					nodo_atras->siguiente = nodo_actual->siguiente;
+					nodo_actual->siguiente->anterior = nodo_atras;
+				}
+					
+				cout<<"Paciente eliminado de la lista con exito. \n";
+				nodo_encontrado = true;				
+			
+			}
+			
+			nodo_atras = nodo_actual;
+			nodo_actual= nodo_actual->siguiente;
+		}
+		if(!nodo_encontrado){
+			cout << "\n\n El usuario no ha sido encontrado \n\n";
+		}
+	}else{
+		cout << "\n\n La lista se encuentra vacia, por lo que no hay usuarios para eliminar \n\n";
+	}	
+}
+//BUSCAR EN LA LISTA DE ACTIVOS SOLAMENTE
+void BuscarUsuario (NodoUsuario *&lista, int dato){
+	
+	NodoUsuario *nodo_actual = new NodoUsuario();
+	nodo_actual = primero;
+	bool nodo_encontrado = false;
+	
+	if(primero != NULL){
+		
+		while(nodo_actual != NULL && nodo_encontrado != true){
+			if(nodo_actual -> Cedula == dato || nodo_actual -> TelefonoCelular == dato || nodo_actual -> TelefonoHabitacion == dato) {
+				
+				cout << "\n El usuario con la informacion: " <<dato<< ", ha sido encontrado con exito, sus datos completos son: \n\n";
+				
+				cout << " Nombre: "<< nodo_actual -> Nombre << endl;
+				cout << " Primer apellido: "<< nodo_actual -> PrimerApellido << endl;
+				cout << " Segundo apellido: "<< nodo_actual -> SegundoApellido << endl;
+				cout << " Telefono celular: "<< nodo_actual -> TelefonoCelular << endl;
+				cout << " Telefono de habitacion: "<< nodo_actual -> TelefonoHabitacion << endl;
+				cout << " Cedula: "<< nodo_actual -> Cedula << endl << "\n" ;
+			 nodo_encontrado = true;
+			}
+			nodo_actual = nodo_actual -> siguiente;
+		}
+		if(!nodo_encontrado){
+			cout << "\n\n El usuario no ha sido encontrado \n\n";
+				
+		}
+	}else{
+		cout << "\n\n La lista se encuentra vacia, por lo que no hay usuarios que buscar \n\n";
+		    
+	}	
+	
+}
+
+//FUNCION COMBINADA PARA LISTA DOBLEMENTE ENLAZADA Y CIRCULAR SIMPLE -> QUE RETORNE VERDADERO SI SE ENCUENTRA EL CONTACTO EN LA LISTA O FALSE SI NO LO ENCUENTRA
+bool BuscarUsuarioTodasListas(NodoUsuario *&lista, int dato){
+	
+	NodoUsuario *nodo_actual = new NodoUsuario();
+	nodo_actual = primero;
+	bool nodo_encontrado = false;
+	nodoCircular *nodo_actualCircular = new nodoCircular();
+	nodo_actualCircular = primeroCircular;
+
+	//PRIMERO BUSCAR EN LISTA DOBLEMENTE ENLAZADA
+	if((primero != NULL) ){
+		
+		while(nodo_actual != NULL && nodo_encontrado != true){
+			if(nodo_actual -> Cedula == dato || nodo_actual -> TelefonoCelular == dato || nodo_actual -> TelefonoHabitacion == dato) {
+				cout << "\n ############# ATENCION ################\n";
+				cout << "\n El usuario con la informacion: " <<dato<< ", ha sido encontrado con exito en la lista de ** ACTIVOS **, sus datos completos son: \n\n";
+				cout << "\n POR ESTA RAZON NO SE PUEDE INGRESAR ESTE USUARIO\n\n";				
+				cout << " Nombre: "<< nodo_actual -> Nombre << endl;
+				cout << " Primer apellido: "<< nodo_actual -> PrimerApellido << endl;
+				cout << " Segundo apellido: "<< nodo_actual -> SegundoApellido << endl;
+				cout << " Telefono celular: "<< nodo_actual -> TelefonoCelular << endl;
+				cout << " Telefono de habitacion: "<< nodo_actual -> TelefonoHabitacion << endl;
+				cout << " Cedula: "<< nodo_actual -> Cedula << endl << "\n" ;
+			   nodo_encontrado = true;
+			   return true;
+			}
+			nodo_actual = nodo_actual -> siguiente;
+		}
+		if(!nodo_encontrado){
+			cout << "\n\n ***ATENCION VALIDACION **** \n\n";
+			cout << "\n\n El usuario no ha sido encontrado en la lista de USUARIOS ACTIVOS \n\n";
+				
+		}
+	} 
+	 //SI NO ENCUENTRA EN LA LISTA ANTERIOR BUSCAMOS EN LA CIRCULAR
+	 if( (primeroCircular != NULL)){
+
+		 //DEBO BUSCAR EN LISTA CIRCULAR
+		 	do{
+					//	cout<<"TESTING nodo_actual != NULL && nodo_encontrado != true \n\n";
+			if(nodo_actualCircular-> cedula == dato || nodo_actualCircular-> telefonoCelular == dato || nodo_actualCircular-> telefonoHabitacion == dato) {
+				cout << "\n ############# ATENCION ################\n";
+				cout << "\n El usuario con la informacion: " << dato << ", ha sido encontrado con exito en la lista de ** INACTIVOS **, sus datos completos son: \n\n";
+				cout << "\n POR ESTA RAZON NO SE PUEDE INGRESAR ESTE USUARIO\n\n";				
+				cout << " Nombre: "<< nodo_actualCircular-> nombre << endl;
+				cout << " Primer apellido: "<< nodo_actualCircular->primerApellido << endl;
+				cout << " Segundo apellido: "<< nodo_actualCircular-> segundoApellido << endl;
+				cout << " Telefono celular: "<< nodo_actualCircular-> telefonoCelular << endl;
+				cout << " Telefono de habitacion: "<< nodo_actualCircular-> telefonoHabitacion << endl;
+				cout << " Cedula: "<< nodo_actualCircular-> cedula << endl << "\n" ;
+				nodo_encontrado = true;
+				return true;
+		                      }
+		            nodo_actualCircular = nodo_actualCircular->siguienteCircular;
+	          } while(nodo_actualCircular != primeroCircular && nodo_encontrado != true);
+	          if(!nodo_encontrado){
+	        cout << "\n\n ***ATENCION VALIDACION **** \n\n";
+			cout << "\n El usuario no ha sido encontrado en la lista de USUARIOS INACTIVOS \n\n";
+			return false;//devuelve 0 que significa falso   ACA RETORNO FALSO PORQUE EL CONTACTO NO SE ENCUENTRA EN NINGUNA DE LAS 2 LISTAS
+		}
+			}
+	else{
+		cout << "\n\n ***ATENCION VALIDACION **** \n\n";
+		cout << "\n\n EL CONTACTO BUSCADO NO SE ENCUENTRA EN NINGUNA LISTA... \n\n";
+		
+		 
+		return false;//devuelve 0 que significa falso
+		    
+	}
+	
+	
+}
+
+void MostrarUsuarios(){
+	
+	NodoUsuario *nodo_actual = new NodoUsuario();
+	nodo_actual = primero ;  //IGUALO A PRIMERO PORQUE TRABAJO CON LISTA DOBLE
+	
+	if(primero != NULL){   //COMPARO CON PRIMERO PORQUE TRABAJO CON LISTA DOBLE
+
+	while(nodo_actual != NULL){
+		cout << "Usuario con el nombre: "<< nodo_actual -> Nombre << endl;
+		cout << "Usuario con el primer apellido: "<< nodo_actual -> PrimerApellido << endl;
+		cout << "Usuario con el segundo apellido: "<< nodo_actual -> SegundoApellido << endl;
+		cout << "Usuario con el telefono celular: "<< nodo_actual -> TelefonoCelular << endl;
+		cout << "Usuario con el telefono de habitacion: "<< nodo_actual -> TelefonoHabitacion << endl;
+		cout << "Usuario con la cedula: "<< nodo_actual -> Cedula << endl << "\n" ;
+		
+		nodo_actual = nodo_actual->siguiente;
+		}
+	
+	} else{
+		cout << "####################################  ATENCION  ##############################################\n";
+		cout << "\n\n La lista de contactos ACTIVOS encuentra vacia, por lo que no hay usuarios que mostrar \n\n";
+	}
+}
+
+void inactivarUsuario(){
+	
+	
+	//#1. Paso es BUSCAR el contacto que el usuario desea INACTIVAR	
+	NodoUsuario *nodo_actual = new NodoUsuario();
+	nodo_actual = primero;
+ 	NodoUsuario *nodo_atras = new NodoUsuario();
+	nodo_atras = NULL;
+    
+	bool nodo_encontrado = false;
+	int nodo_buscado;
+	cout << "\n Ingrese la cedula, el telefono celular o el telefono de habitacion del usuario que quiere buscar: ";
+	cin >> nodo_buscado;
+	
+	if(primero != NULL){
+		
+		while(nodo_actual != NULL && nodo_encontrado != true){
+		//	cout<<"TESTING nodo_actual != NULL && nodo_encontrado != true \n\n";
+			if(nodo_actual -> Cedula == nodo_buscado || nodo_actual -> TelefonoCelular == nodo_buscado || nodo_actual -> TelefonoHabitacion == nodo_buscado) {
+				
+				cout << "\n El usuario con la informacion: " << nodo_buscado << ", ha sido encontrado con exito, sus datos completos son: \n\n";
+				
+				cout << " Nombre: "<< nodo_actual -> Nombre << endl;
+				cout << " Primer apellido: "<< nodo_actual -> PrimerApellido << endl;
+				cout << " Segundo apellido: "<< nodo_actual -> SegundoApellido << endl;
+				cout << " Telefono celular: "<< nodo_actual -> TelefonoCelular << endl;
+				cout << " Telefono de habitacion: "<< nodo_actual -> TelefonoHabitacion << endl;
+				cout << " Cedula: "<< nodo_actual -> Cedula << endl << "\n" ;
+			//	nodo_encontrado = true;
+	    //************************************************************** FIN PASO #1 ************************************************************************	
+									
+	//#2. Paso, si el usuario es encontrado lo vamos a GUARDAR/REGISTRAR/ALMANCENAR en la lista CIRCULAR con los contactos dados de baja
+		        //    if(nodo_encontrado == true){
+		            	  	nodoCircular *nuevo_nodoCircular = new nodoCircular(); //creo el nuevo nodo para la lista Circular
+		            	    
+	                        nuevo_nodoCircular->cedula = nodo_actual->Cedula; //almaceno los valores de la guia en la lista circular
+	                        nuevo_nodoCircular->nombre = nodo_actual->Nombre;
+	                        nuevo_nodoCircular->primerApellido = nodo_actual->PrimerApellido;
+							nuevo_nodoCircular->segundoApellido = nodo_actual->SegundoApellido;
+							nuevo_nodoCircular->telefonoCelular = nodo_actual->TelefonoCelular;
+							nuevo_nodoCircular->telefonoHabitacion = nodo_actual->TelefonoHabitacion;
+							
+							
+							  nodoCircular *aux1 = primeroCircular;
+	                           nodoCircular *aux2;
+	 
+	                            bool encontradoCircular = false;
+	                            bool new_validation = false;
+	                        
+								
+	                               if(primeroCircular == NULL){
+		                                 primeroCircular = nuevo_nodoCircular;
+		                                 primeroCircular->siguienteCircular= primeroCircular;
+		                                 primeroCircular->anteriorCircular = primeroCircular;
+		                                 ultimoCircular= primeroCircular;
+	                                   }else{
+		                                 	//**************************************
+		  //CONDICIONAL IF PARA COMPARAR SI EL PRIMER VALOR ES EL PRIMERO & ULTIMO 
+		  //SI EL NUEVO VALOR ES MAYOR AL PRIMERO , ENTONCES CREAMOS UN NUEVO NODO AL INICIO COMO PRIMERO Y CORRO EL VALOR EXISTENTE A LA SEGUNDA POSICION COMO ULTIMO
+		  if((aux1 != NULL ) && (aux1->nombre > nuevo_nodoCircular->nombre) && (primeroCircular == ultimoCircular)){
+		  	
+		  	primeroCircular->anteriorCircular = nuevo_nodoCircular;
+		  	nuevo_nodoCircular->siguienteCircular = ultimoCircular;  //aux1
+		  	primeroCircular = nuevo_nodoCircular;
+		  	primeroCircular->siguienteCircular = ultimoCircular;
+		  	ultimoCircular->siguienteCircular = primeroCircular;
+		  	ultimoCircular->anteriorCircular = primeroCircular;
+	
+		  	
+		 //  cout<<"GUARDO VALOR CUANDO INGRESO UN # MENOR AL PRIMERO DE LA LISTA INGRESO 1 Y TENGO 2 COMO PRIMER VALOR EN LA LISTA Y SOLO TENGO UN VALOR EN LISTA \n";
+		
+			 } 
+			else if((aux1 != NULL ) && (aux1->nombre < nuevo_nodoCircular->nombre) && (primeroCircular == ultimoCircular)){
+		 	ultimoCircular->siguienteCircular = nuevo_nodoCircular;
+		 	nuevo_nodoCircular->siguienteCircular = primeroCircular;
+		    ultimoCircular = nuevo_nodoCircular;
+		    ultimoCircular->anteriorCircular = primeroCircular;	
+			primeroCircular->siguienteCircular = ultimoCircular;	 
+			
+			// cout<<"GUARDO VALOR CUANDO INGRESO UN # MAYOR AL PRIMERO DE LA LISTA INGRESO 2 Y TENGO 1 COMO PRIMER VALOR EN LA LISTA Y SOLO TENGO UN VALOR EN LISTA \n";	
+		
+			 }  
+		 cout<<"INGRESO AL WHILE \n";	 
+		while((aux1 != NULL)&&(aux1->nombre < nuevo_nodoCircular->nombre ) && (primeroCircular != ultimoCircular) && (encontradoCircular != true)){   ///OJO PENDIENTE
+			aux2 = aux1;
+			aux1 = aux1->siguienteCircular;
+		    new_validation = true;
+			cout<<"Nombre es: " << nuevo_nodoCircular->nombre<<"\n"; //validacion para Debugging
+			   if (aux1 == primeroCircular){
+			   	  encontradoCircular = true;
+			   }
+		}
+		
+		 cout<<"SALGO DEL WHILE \n";	 
+		
+		if((aux1 != NULL)&&(aux1->nombre < nuevo_nodoCircular->nombre ) && (aux1 == primeroCircular )){
+		//	cout<<"#1 if((aux1 != NULL)&&(aux1->nombre < nuevo_nodoCircular->nombre ) && (aux1 == primeroCircular )) \n";	
+			ultimoCircular->siguienteCircular = nuevo_nodoCircular;
+		 	nuevo_nodoCircular->siguienteCircular = primeroCircular;
+		 	nuevo_nodoCircular->anteriorCircular = ultimoCircular;
+		    ultimoCircular = nuevo_nodoCircular;	
+			
+		}
+		
+		//CONDICIONAL PARA INSERTAR UN NUMERO DELANTE DEL PRIMERO   ***********************************
+		
+	
+		else if((aux1 != NULL)&&(aux1->nombre > nuevo_nodoCircular->nombre ) && (aux1 == primeroCircular )){
+			//	 cout<<"#2 else if \n";				    
+		    primeroCircular->anteriorCircular = nuevo_nodoCircular;
+		    nuevo_nodoCircular->siguienteCircular = primeroCircular;
+		  	primeroCircular = nuevo_nodoCircular;
+		  	ultimoCircular->siguienteCircular = primeroCircular;
+               
+		}
+		
+			
+	                  	
+		 else if((aux1 != NULL) && (aux1->nombre > nuevo_nodoCircular->nombre) && (aux1 == ultimoCircular) &&(aux2 == primeroCircular)){
+		 //	cout<<"#3  else if \n";
+		 	aux2->siguienteCircular = nuevo_nodoCircular;	 
+			nuevo_nodoCircular->anteriorCircular = aux2;	
+		 	nuevo_nodoCircular->siguienteCircular = aux1;
+		 	aux1->anteriorCircular = nuevo_nodoCircular;
+		    aux1->siguienteCircular = primeroCircular;
+		    ultimoCircular = aux1;
+		    primeroCircular = aux2;
+
+		
+		//	cout<<"AUX1 = ULTIMO & AUX2 = PRIMERO \n";
+		//	cout<<"GUARDO VALOR CUANDO AUX1->SIGUIENTE ES == NULL , 1 = aux2 -> 2X -> 4 = aux1 \n";		
+		}
+		// NO TOCAMOS PRIMERO NI ULTIMO VALOR DE LA LISTA 
+ 		 else if((aux1 != NULL ) && (aux1->nombre > nuevo_nodoCircular->nombre) && (aux1 != ultimoCircular) &&(aux2 != primeroCircular)){   // OJO PENDIENTE
+		 //	cout<<"#4  else if\n";
+		 	aux2->siguienteCircular = nuevo_nodoCircular;	 
+			nuevo_nodoCircular->anteriorCircular = aux2;	
+		 	nuevo_nodoCircular->siguienteCircular = aux1;
+		 	aux1->anteriorCircular = nuevo_nodoCircular;
+		 	
+		 	//	cout<<"SE EJECUTA POR DEFECTO #1 \n";
+		
+			 } 
+			 
+			 //ELSE IF PARA COMPARAR SI EL VALOR DE LA LISTA ES MENOR AL NUEVO INGRESADO POR EL USUARIO Y SI EL VALOR DEL AUX2 ES IGUAL AL PRIMERO
+			 //EL AUX1 ES MAYOR AL VALOR NUEVO INGRESADO PARA EL CONTACTO
+			 //SE AGREGA EL NUEVO VALOR EN LA SEGUNDA POSICION DE LA LISTA
+			  else if((aux1 != NULL ) && (aux1->nombre > nuevo_nodoCircular->nombre)  &&(aux2 == primeroCircular)){   // OJO PENDIENTE
+		 	//	cout<<"#5  else if\n";
+		 	aux2->siguienteCircular = nuevo_nodoCircular;	 
+			nuevo_nodoCircular->anteriorCircular = aux2;	
+		 	nuevo_nodoCircular->siguienteCircular = aux1;
+		 	aux1->anteriorCircular = nuevo_nodoCircular;
+		 	primeroCircular = aux2;
+		 	primeroCircular->siguienteCircular = nuevo_nodoCircular;
+		 	
+		 //		cout<<"SE EJECUTA PORQUE AUX2 es == PRIMERO PERO AUX1 NO ES = A ULTIMO \n";
+		
+			 }
+			    //******************************************************************
+			   else if((aux1 != NULL ) && (aux1->nombre > nuevo_nodoCircular->nombre)  &&(aux1 == ultimoCircular) && (new_validation == true)){
+			   	
+			   	//	cout<<"#6  else if\n";
+		     	aux2->siguienteCircular = nuevo_nodoCircular;
+		     	nuevo_nodoCircular->siguienteCircular = ultimoCircular;
+		        nuevo_nodoCircular->anteriorCircular = aux2;
+	            ultimoCircular->siguienteCircular = primeroCircular;
+	            ultimoCircular->anteriorCircular = nuevo_nodoCircular;
+		        
+		        
+		    //    	cout<<"SE EJECUTA PORQUE AUX1 ES == ULTIMO PERO AUX2 NO ES = A PRIMERO";
+		        
+	                  	}            
+			
+		
+		
+	                                    }
+	                                   
+	                                   cout<<"# Cedula ingresado correctamente en la lista de INACTIVOS \n";
+					                          
+        //************************************************************** FIN PASO #2 ************************************************************************	
+		
+			
+		//#3. Eliminar el nodo encontrado de la listadoblemente enlazada
+
+		                            //	cout<<"TESTING nodo_actual != NULL \n";
+		                            	
+		                            	 if((primero->anterior == NULL) && (primero->siguiente == NULL)){
+		                            	 //	cout<<"primero->anterior == NULL) && (primero->siguiente == NULL \n";
+		                                    primero = NULL;
+		                                    ultimo = NULL;
+	                                       //  cout<<"Testing elimino unico dato con exito \n";
+
+                                                    }
+
+				                            else if(nodo_actual == primero){
+				                            //	cout<<"TESTING nodo_actual == primero \n";
+					                           primero = primero->siguiente;
+					                           primero->anterior = NULL;
+				                                                 }
+											else if(nodo_actual == ultimo){
+											//	cout<<"TESTING nodo_actual == ultimo \n";
+					                           nodo_atras->siguiente = NULL;
+					                           ultimo = nodo_atras;
+					                          // cout<<"TESTING V2 nodo_actual == ultimo \n";
+					                   
+			                                	                     }                       
+											else{
+											//	cout<<"TESTING ULTIMO ELSE \n";
+											//	cout<<"Contacto con el numero de Cedula -> "<<nodo_actual->Cedula<< " , #1 \n";
+											//	cout<<"NodoActual->Siguiente -> "<<nodo_actual->siguiente->Cedula<< " , #1 \n";
+												 nodo_atras->siguiente = nodo_actual->siguiente;
+					                          //      cout<<"atras->siguiente = nodo_actual->siguiente; \n";
+					                            //  cout<<"Contacto con el numero de Cedula -> "<<nodo_actual->Cedula<< " , #2 \n";  
+					                              nodo_actual->siguiente->anterior = nodo_atras;
+					                              //cout<<"nodo_actual->siguiente->anterior = atras;\n";					                              						                              					                              
+					                              
+					                             // cout<<"ELIMINADO = TRUE \n";
+				                                }
+					            cout<<"Contacto con el numero de Cedula -> "<<nodo_actual->Cedula<< " , ha sido INACTIVADO con exito. \n";				
+			                    nodo_encontrado = true;                                                             
+
+	  }  
+	     
+		 nodo_atras = nodo_actual;
+		 nodo_actual = nodo_actual->siguiente;
+		     
+	  }
+	  
+	        if(!nodo_encontrado){
+			  cout << "\n\n El usuario no se encuentra en la lista de contactos \n\n";
+		                          }
+			                   
+		}
+		     else{
+		cout << "\n\n La lista se encuentra vacia, por lo que no hay usuarios que buscar \n\n";
+	        }		
+
+}
+
+
+
+
+
+void activarUsuario(){
+	
+	//#1. Paso es BUSCAR en la lista CIRCULAR el contacto que el usuario desea ACTIVAR
+
+	nodoCircular *nodo_actualCircular = new nodoCircular();
+	nodo_actualCircular = primeroCircular;
+	nodoCircular *atrasCircular = new nodoCircular();
+	atrasCircular = NULL;
+
+	bool nodo_encontrado = false;
+	int nodo_buscado;
+	cout << "\n Ingrese la cedula, el telefono celular o el telefono de habitacion del usuario que desea ACTIVAR: ";
+	cin >> nodo_buscado;
+	cout<<"NUMERO INGRESADO ES: "<<nodo_buscado <<" \n\n";
+	if(primeroCircular != NULL){
+		
+		do{
+					//	cout<<"TESTING nodo_actual != NULL && nodo_encontrado != true \n\n";
+			if(nodo_actualCircular-> cedula == nodo_buscado || nodo_actualCircular-> telefonoCelular == nodo_buscado || nodo_actualCircular-> telefonoHabitacion == nodo_buscado) {
+				
+				cout << "\n El usuario con la informacion: " << nodo_buscado << ", ha sido encontrado con exito, sus datos completos son: \n\n";
+				
+				cout << " Nombre: "<< nodo_actualCircular-> nombre << endl;
+				cout << " Primer apellido: "<< nodo_actualCircular->primerApellido << endl;
+				cout << " Segundo apellido: "<< nodo_actualCircular-> segundoApellido << endl;
+				cout << " Telefono celular: "<< nodo_actualCircular-> telefonoCelular << endl;
+				cout << " Telefono de habitacion: "<< nodo_actualCircular-> telefonoHabitacion << endl;
+				cout << " Cedula: "<< nodo_actualCircular-> cedula << endl << "\n" ;
+		//		nodo_encontrado = true;
+		//************************************************* FIN PASO#1 ****************************************************************************
+				
+		//#2. Paso, si el usuario es encontrado lo vamos a GUARDAR/REGISTRAR/ALMANCENAR en la lista DOBLE con los contactos ACTIVOS	
+
+		            	  	NodoUsuario *nuevo_nodo = new NodoUsuario(); //creo el nuevo nodo para la lista DOBLE
+
+		            	  	nuevo_nodo->Cedula = nodo_actualCircular->cedula;//almaceno los valores de la lista circular en la lista Doble - ACTIVOS   
+	                        nuevo_nodo->Nombre = nodo_actualCircular->nombre;
+	                        nuevo_nodo->PrimerApellido = nodo_actualCircular->primerApellido;
+							nuevo_nodo->SegundoApellido = nodo_actualCircular->segundoApellido;
+							nuevo_nodo->TelefonoCelular = nodo_actualCircular->telefonoCelular;
+							nuevo_nodo->TelefonoHabitacion = nodo_actualCircular->telefonoHabitacion;
+							
+								
+                        	NodoUsuario *aux1 = primero;  //LISTA DOBLE LO IGUALO A PRIMERO EN LUGAR DE LISTA
+	                        NodoUsuario *aux2;
+	
+	                        NodoUsuario *atras = NULL;  //PUEDO USARLO EN LA LISTA DOBLE 
+		
+	             	//IF-ELSE CONDICIONAL PARA VALIDAR SI EL PRIMER VALOR ES NULL PARA INGRESAR EL CONTACTO ACA O NO	             										
+	                              		if(primero == NULL){    //
+		                                     primero = nuevo_nodo;     //
+		                                     primero->siguiente = NULL;  //
+		                                     primero->anterior = NULL;   //
+		                                     ultimo = nuevo_nodo;    //
+	                                   }else{
+		                                 	while((aux1 != NULL)&&(aux1->Nombre < nuevo_nodo->Nombre )){
+			                                  aux2 = aux1;
+			                                  aux1 = aux1->siguiente;
+			
+		                                              }if(primero == aux1 ){
+	                                    primero->anterior = nuevo_nodo;	
+	                                    nuevo_nodo->anterior =NULL;	
+                                        nuevo_nodo->siguiente = aux1;
+                                        primero = nuevo_nodo;
+		                                   }
+ 		                              else if((aux1 != NULL ) && (aux1->Nombre > nuevo_nodo->Nombre)){
+		 	
+		 	                                aux2->siguiente = nuevo_nodo;	 
+		                       	              nuevo_nodo->anterior = aux2;	
+		 	                                 nuevo_nodo->siguiente = aux1;
+		 	                                  aux1->anterior = nuevo_nodo;
+		
+			                               }        
+			
+		                             	else{
+		     	                             aux2->siguiente = nuevo_nodo;
+	                                         ultimo->siguiente = nuevo_nodo;
+		                                     nuevo_nodo->siguiente = NULL;
+		                                     nuevo_nodo->anterior = ultimo;
+		                                     ultimo = nuevo_nodo;
+	                  	                       }
+	                                       }
+	                                   
+	                                   cout<<"# Cedula ingresado correctamente en la lista de ACTIVOS \n";
+					                      //    }
+		//#3. Eliminar el nodo encontrado de la lista CIRCULAR
+		                            	
+		                            //	cout<<"nodo_actual != NULL \n\n";
+		                            	
+		                            	 if(primeroCircular == ultimoCircular ){  // BUSCO SI EL PRIMERO NODO ES IGUAL AL ULTIMO, VALIDO.
+		                                   
+		                                   primeroCircular->siguienteCircular = NULL;
+		                                   primeroCircular = NULL;
+		                                   ultimoCircular->siguienteCircular = NULL;
+		                                   ultimoCircular->anteriorCircular = NULL;
+		                                  
+		                                    ultimoCircular = NULL;
+		                                    
+	                                     //    cout<<"Testing elimino unico dato con exito \n";
+
+                                                    }
+
+				                            else if(nodo_actualCircular == primeroCircular){
+				                            	primeroCircular = primeroCircular->siguienteCircular;
+				                            	ultimoCircular->siguienteCircular = primeroCircular;
+					                           
+				                                                 }
+											else if(nodo_actualCircular == ultimoCircular){
+											  atrasCircular->siguienteCircular = primeroCircular;
+											   ultimoCircular = atrasCircular;
+
+			                                	                     }                       
+											else{
+					                              atrasCircular->siguienteCircular = nodo_actualCircular->siguienteCircular;
+
+				                                }
+					            cout<<"Contacto con el numero de Cedula -> "<<nodo_actualCircular->cedula<< " , ha sido ACTIVADO con exito. \n";				
+			                                                                                  
+		                        
+		                                      nodo_encontrado = true;
+	                                               }
+	                                               
+	                            atrasCircular = nodo_actualCircular;
+			                    nodo_actualCircular = nodo_actualCircular->siguienteCircular;
+	  }   while(nodo_actualCircular != primeroCircular && nodo_encontrado != true);
+	                            	       
+		    if(!nodo_encontrado){
+			  cout << "\n\n El usuario no se encuentra en la lista de contactos \n\n";
+		                          }	                   
+		}
+		     else{
+		cout << "\n\n La lista de contactos ACTIVOS se encuentra vacia \n\n";
+	        }		
+
+}
+
+
+//Funcion para mostrar la lista de Contactos que estan Inactivos
+void mostrarListaBajas(){
+    nodoCircular *actualCircular = new nodoCircular();
+	actualCircular = primeroCircular;
+	
+	if(primeroCircular != NULL){
+		cout<<"##################### LISTA CONTACTOS INACTIVOS ###################################### "<<"\n";
+			
+		do{
+	     	
+	     	cout << " Contacto con el Nombre  : "<< actualCircular->nombre <<"\n"; 
+			cout << " Contacto con el Primer apellido: "<< actualCircular->primerApellido <<"\n";
+			cout << " Contacto con el Segundo apellido: "<< actualCircular->segundoApellido <<"\n";
+			cout << " Contacto con el Telefono celular: "<< actualCircular->telefonoCelular <<"\n" ;
+			cout << " Contacto con el Telefono de habitacion: "<< actualCircular->telefonoHabitacion << "\n";
+			cout<< "Contacto con el# Cedula del contacto: "<<actualCircular->cedula <<"\n""\n";
+	     	actualCircular = actualCircular->siguienteCircular;
+		 
+
+		}	while(actualCircular != primeroCircular);
+	
+	}else{
+		cout<<"############# ATENCION ########################\n";
+		cout<<"############# LISTA CONTACTOS INACTIVOS SE ENCUENTRA VACIA. ########################\n";
+	}
+	
+}
+
+
+void BuscarPorLetra(){
+	
+	NodoUsuario *nodo_actual = new NodoUsuario();//lista doble
+	nodo_actual = primero ;
+	
+	nodoCircular *actualCircular = new nodoCircular();// lista circular
+	actualCircular = primeroCircular;
+	
+	char letra;
+	bool hay = false; // variable nada más para saber si hay algún nombre de usuario con la letra buscada
+	
+	cout << "\nIngrese una letra para buscar usuarios cuyo nombre empiece con dicha letra ";
+	cin >> letra;
+	cout << endl;
+	letra = toupper(letra);// se convierte lo que ingrese el usuario a mayus gracias al metodo de la libreria <cctype> 
+	
+	if(primero != NULL){   // proceso para mostrar usuarios activos con la letra que se ingreso
+
+	while(nodo_actual != NULL ){
+		if(nodo_actual-> Nombre[0] == letra){// se pregunta que si el nombre del nodo actual en la posicion 0 es igual a la letra, entonces muestre por pantalla
+			cout << "Usuario con el nombre: "<< nodo_actual -> Nombre << endl;
+			cout << "Usuario con el primer apellido: "<< nodo_actual -> PrimerApellido << endl;
+			cout << "Usuario con el segundo apellido: "<< nodo_actual -> SegundoApellido << endl;
+			cout << "Usuario con el telefono celular: "<< nodo_actual -> TelefonoCelular << endl;
+			cout << "Usuario con el telefono de habitacion: "<< nodo_actual -> TelefonoHabitacion << endl;
+			cout << "Usuario con la cedula: "<< nodo_actual -> Cedula << endl << "\n" ;
+			hay = true;
+			}
+			nodo_actual = nodo_actual->siguiente;
+		}
+	
+	}else if(hay == false){
+		cout << "\nNo hay usuarios activos cuyo nombre inicie con la letra: " << letra <<endl<<endl;
+	}
+	
+	 else{
+		cout << "####################################  ATENCION  ##############################################\n";
+		cout << "\n\n La lista de contactos ACTIVOS encuentra vacia, por lo que no hay usuarios que mostrar \n\n";
+	}
+	
+	//usuarios inactivos
+	if(primeroCircular != NULL){	
+		cout<<"##################### LISTA CONTACTOS INACTIVOS ###################################### "<<"\n";		
+		do{
+	     	if(actualCircular->nombre[0] == letra){// igual se pregunta que si en el nodo que hay (minimo 1 debido al if anterior a este) el primer caracter del nombre coincide con lo que se ingresa por pantalla,, entonces imprime
+	     											// de lo contrario pasa al siguiente nodo y si hay 1 nodo en toda la lista, se sale del while
+	     		cout << " Contacto con el Nombre  : "<< actualCircular->nombre <<"\n"; 
+				cout << " Contacto con el Primer apellido: "<< actualCircular->primerApellido <<"\n";
+				cout << " Contacto con el Segundo apellido: "<< actualCircular->segundoApellido <<"\n";
+				cout << " Contacto con el Telefono celular: "<< actualCircular->telefonoCelular <<"\n" ;
+				cout << " Contacto con el Telefono de habitacion: "<< actualCircular->telefonoHabitacion << "\n";
+				cout<< "Contacto con el# Cedula del contacto: "<<actualCircular->cedula <<"\n""\n";
+				hay = true;
+			 }
+	     	
+	     	actualCircular = actualCircular->siguienteCircular;
+		 
+
+		}	while(actualCircular != primeroCircular);
+	
+	}else if(hay == false){
+		cout << "\nNo hay usuarios inactivos cuyo nombre inicie con la letra: " << letra <<endl<<endl;
+	}
+	
+	else{
+		cout<<"############# ATENCION ########################\n";
+		cout<<"############# LISTA CONTACTOS INACTIVOS SE ENCUENTRA VACIA. ########################\n";
+	}
+	
+}
+
+
